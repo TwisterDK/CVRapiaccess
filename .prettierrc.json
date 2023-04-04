@@ -1,0 +1,10 @@
+{
+  "trailingComma": "es5",
+  "printWidth": 185,
+  "tabWidth": 2,
+  "semi": true,
+  "singleQuote": true,
+  "useTabs": false,
+  "endOfLine": "auto",
+  "editor.formatOnSave": true
+}

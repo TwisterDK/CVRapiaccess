@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es6",
+    "lib": ["ES2021", "es6", "dom"],
+    "outDir": "dist",
+    "rootDir": ".",
+    "sourceMap": true,
+    "strict": false
+  }
+}
