@@ -1,5 +1,7 @@
 import { GOTCApiClient, GOTCConfig } from 'generic-odata-typescript-client';
 
+require('dotenv').config();
+
 interface HeliosCoreAPIs {
   universal: string;
 }
@@ -10,11 +12,9 @@ interface HeliosCoreControllers {
 }
 
 const apiHeliosCoreConfig: GOTCConfig<HeliosCoreAPIs, HeliosCoreControllers> = {
-  baseURL: 'https://helios-api-core.obton.com/universal' || '', // process.env.API_URL,
+  baseURL: process.env.API_URL,
 };
 
 export const apiHeliosCore = new GOTCApiClient(apiHeliosCoreConfig);
 
 export default apiHeliosCore;
-
-// http://distribution.virk.dk/cvr-permanent/virksomhed/_search?q=Vrvirksomhed.cvrNummer:31596106
