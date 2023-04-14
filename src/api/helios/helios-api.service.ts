@@ -1,8 +1,11 @@
+/* eslint-disable no-underscore-dangle */
 import { OdataQueryBuilder } from 'generic-odata-typescript-client';
 import apiHeliosCore from './api-helios-core.config';
 import { HeliosResponse } from './helios-response.type';
-import { Company } from '../../types/company.type';
-import { CVRItem } from '../../types/cvrItem.type';
+import { Company } from '../../types/helios/company.type';
+import { UpsertCVRItem } from '../../types/helios/upsertcvrItem.type';
+import { cvrData } from '../../types/cvr/cvrData.type';
+import createUpsertCVRItem from '../../util/createUpsertCVRItem';
 
 export const getDKcompanies = async (): Promise<Company[]> => {
   const queryBuilder = new OdataQueryBuilder<Company>();
@@ -11,6 +14,7 @@ export const getDKcompanies = async (): Promise<Company[]> => {
     controller: 'LINK.tblCompanies',
     // url: queryBuilder.filter((filter) => filter.eq('Companies_SpeedguideStatus', 'Active').eq('Companies_Country', 'Denmark')).toQuery(),
     url: queryBuilder.filter((filter) => filter.eq('Companies_Country', 'Denmark')).toQuery(),
+    validateStatus: () => true,
   });
 
   // Check status.
@@ -24,18 +28,21 @@ export const getDKcompanies = async (): Promise<Company[]> => {
   return response.data.value;
 };
 
-export const saveCVRData = async (cvr: number, cvrData: any): Promise<void> => {
+export const saveCVRData = async (cvr: number, data: cvrData): Promise<void> => {
   // TODO gem i datasen
-  const heliosItem: CVRItem = {
-    CVR: cvr,
-    JSON: cvrData,
-    Timestamp: new Date(),
-  };
-  await apiHeliosCore.post({
-    api: 'universal',
-    controller: 'dbo.CVRjsonDataTEST',
-    data: [heliosItem],
-    validateStatus: () => true,
-  });
-  // TODO evt. map cvr data til db model.
+  // const heliosItem: CVRItem = {
+  //   CVR: cvr,
+  //   JSON: JSON.stringify(data),
+  //   Timestamp: new Date(),
+  // };¨
+  if (data.hits) {
+    const heliosItems: UpsertCVRItem[] = await createUpsertCVRItem(cvr, data);
+
+    await apiHeliosCore.post({
+      api: 'universal',
+      controller: 'dbo.CVRjsonData',
+      data: heliosItems,
+      validateStatus: () => true,
+    });
+  }
 };

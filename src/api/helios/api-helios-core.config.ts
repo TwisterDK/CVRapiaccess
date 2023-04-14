@@ -7,7 +7,7 @@ interface HeliosCoreAPIs {
 }
 
 interface HeliosCoreControllers {
-  'dbo.CVRjsonDataTEST': string;
+  'dbo.CVRjsonData': string;
   'LINK.tblCompanies': string;
 }
 

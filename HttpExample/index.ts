@@ -2,6 +2,7 @@
 import { AzureFunction, Context, HttpRequest } from '@azure/functions';
 import UpdateCVRinfo from '../src/updateCVRinfo';
 
+// eslint-disable-next-line func-names
 const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest): Promise<void> {
   context.log('HTTP trigger function processed a request.');
   // const name = req.query.name || (req.body && req.body.name);
