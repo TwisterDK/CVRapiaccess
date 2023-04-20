@@ -2,13 +2,15 @@ import { GOTCApiClient, GOTCConfig } from 'generic-odata-typescript-client';
 
 require('dotenv').config();
 
+export const HTTP_OK = 200;
+
 interface HeliosCoreAPIs {
   universal: string;
 }
 
 interface HeliosCoreControllers {
   'dbo.CVRjsonData': string;
-  'dbo.CVRledelser': string;
+  'dbo.CVRManagement': string;
   'LINK.tblCompanies': string;
 }
 

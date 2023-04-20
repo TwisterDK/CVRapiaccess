@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 
 import { cvrData } from '../types/cvr/cvrData.type';
-import { UpsertCVRledelser } from '../types/helios/upsertcvrledelser.type';
+import { UpsertCVRManagement } from '../types/helios/upsertcvrManagement.type';
 import { DeltagerRelation } from '../types/cvr/DeltagerRelation.type';
 import { getLatestName, getLatestAddress, getLatestAttribute } from './getLatest.functions';
 import { Organisationer } from '../types/cvr/Organisationer.type';
@@ -31,34 +31,35 @@ const getOrganisationer = (deltagerrelation: DeltagerRelation, hovedtype: string
   return org;
 };
 
-export const createUpsertCVRLedelser = (cvr: number, data: cvrData): UpsertCVRledelser[] => {
-  const heliosLedelseItems: UpsertCVRledelser[] = getDeltagerRelations(cvr, data)
+export const createUpsertCVRLedelser = (cvr: number, data: cvrData): UpsertCVRManagement[] => {
+  const heliosLedelseItems: UpsertCVRManagement[] = [];
+  getDeltagerRelations(cvr, data)
     .filter((item) => item.deltager !== null)
-    .map((relation) => {
-      const item: UpsertCVRledelser = {
-        CVR: cvr,
-        Timestamp: new Date(),
-        DeltagerType: relation.deltager.enhedstype,
-        DeltagerNavn: getLatestName(relation.deltager),
-        Hovedtype: getOrganisationer(relation, 'LEDELSESORGAN')?.hovedtype,
-        Undertype: getLatestAttribute(getOrganisationer(relation, 'LEDELSESORGAN')?.medlemsData[0].attributter, 'FUNKTION')?.vaerdi,
-        Vejnavn: getLatestAddress(relation.deltager.beliggenhedsadresse)?.vejnavn || null,
-        Bynavn: getLatestAddress(relation.deltager.beliggenhedsadresse)?.bynavn || null,
-        Postnummer: getLatestAddress(relation.deltager.beliggenhedsadresse)?.postnummer || null,
-        Postdistrikt: getLatestAddress(relation.deltager.beliggenhedsadresse)?.postdistrikt || null,
-        Landekode: getLatestAddress(relation.deltager.beliggenhedsadresse)?.landekode || null,
-        Valgform: getLatestAttribute(getOrganisationer(relation, 'LEDELSESORGAN')?.medlemsData[0].attributter, 'VALGFORM')?.vaerdi || null,
-        GyldigFra: getLatestAttribute(getOrganisationer(relation, 'LEDELSESORGAN')?.medlemsData[0].attributter, 'VALGFORM')?.periode.gyldigFra || null,
-        GyldigTil: getLatestAttribute(getOrganisationer(relation, 'LEDELSESORGAN')?.medlemsData[0].attributter, 'VALGFORM')?.periode.gyldigTil || null,
-      };
-
-      return item;
+    .forEach((relation) => {
+      relation.organisationer
+        .filter((org) => org.hovedtype === 'LEDELSESORGAN')
+        .forEach((org) => {
+          const item: UpsertCVRManagement = {
+            CVR: cvr,
+            UpdateTime: new Date(),
+            ParticipantType: relation.deltager.enhedstype,
+            ParticipantName: getLatestName(relation.deltager),
+            Maintype: getOrganisationer(relation, 'LEDELSESORGAN')?.hovedtype,
+            Subtype: getLatestAttribute(org.medlemsData[0].attributter, 'FUNKTION')?.vaerdi,
+            Street: getLatestAddress(relation.deltager.beliggenhedsadresse)?.vejnavn || null,
+            City: getLatestAddress(relation.deltager.beliggenhedsadresse)?.bynavn || null,
+            PostalCode: getLatestAddress(relation.deltager.beliggenhedsadresse)?.postnummer || null,
+            PostalDistrict: getLatestAddress(relation.deltager.beliggenhedsadresse)?.postdistrikt || null,
+            CountryCode: getLatestAddress(relation.deltager.beliggenhedsadresse)?.landekode || null,
+            ElectionForm: getLatestAttribute(org.medlemsData[0].attributter, 'VALGFORM')?.vaerdi || null,
+            ValidFrom: getLatestAttribute(org.medlemsData[0].attributter, 'VALGFORM')?.periode.gyldigFra || null,
+            ValidTo: getLatestAttribute(org.medlemsData[0].attributter, 'VALGFORM')?.periode.gyldigTil || null,
+          };
+          heliosLedelseItems.push(item);
+        });
     });
 
-  // TODO ensure that double roles both are saved, e.g. director and boardmember for same person cvr 25612876
-
-  // console.log(heliosLedelseItems);
-  return heliosLedelseItems.filter((hovedtype) => hovedtype.Hovedtype !== undefined && hovedtype.Undertype !== undefined);
+  return heliosLedelseItems.filter((item) => item.Subtype !== undefined);
 };
 
 export default createUpsertCVRLedelser;

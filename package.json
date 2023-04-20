@@ -27,6 +27,6 @@
   },
   "dependencies": {
     "dotenv": "^16.0.3",
-    "generic-odata-typescript-client": "3.0.22"
+    "generic-odata-typescript-client": "3.0.24"
   }
 }
