@@ -15,7 +15,7 @@ interface HeliosCoreControllers {
 }
 
 const apiHeliosCoreConfig: GOTCConfig<HeliosCoreAPIs, HeliosCoreControllers> = {
-  baseURL: process.env.API_URL,
+  baseURL: process.env.HELIOS_API_URL,
 };
 
 export const apiHeliosCore = new GOTCApiClient(apiHeliosCoreConfig);
